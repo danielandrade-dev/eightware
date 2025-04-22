@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useAuth as useAuthService, User } from '../hooks/useAuth';
 
@@ -21,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (auth.isAuthenticated()) {
         const userData = await auth.getMe();
-        setUser(userData);
+        setUser(userData.user);
       }
     } catch (error) {
       console.error('Erro ao carregar usuário:', error);
@@ -33,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     loadUser();
-  }, [loadUser]);
+  }, []);
 
   async function signup(email: string, password: string) {
     await auth.signup({ email, password, password_confirmation: password });

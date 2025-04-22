@@ -40,5 +40,17 @@ module Backend
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Configuração de idioma padrão
+    config.i18n.default_locale = :'pt-BR'
+    config.i18n.available_locales = [:en, :'pt-BR']
+
+    # Adiciona middleware necessário para autenticação
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
+    config.middleware.use Warden::Manager do |manager|
+      manager.default_strategies :jwt
+      manager.failure_app = ->(env) { [401, { 'Content-Type' => 'application/json' }, [{ error: 'Unauthorized' }.to_json]] }
+    end
   end
 end

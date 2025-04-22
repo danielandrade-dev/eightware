@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 export interface SignUpData {
   email: string;
@@ -40,31 +40,31 @@ export const useAuth = () => {
   });
 
   const signup = async (data: SignUpData) => {
-    const response = await api.post('/auth/signup', { user: data });
+    const response = await api.post('/signup', { user: data });
     if (response.data.token) {
       setCookie('token', response.data.token, {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 60 * 24, // 1 dia
+        maxAge: 60 * 60 * 24, 
       });
     }
     return response.data;
   };
 
   const login = async (data: LoginData) => {
-    const response = await api.post('/auth/login', data);
+    const response = await api.post('/login', data);
     if (response.data.token) {
       setCookie('token', response.data.token, {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 60 * 24, // 1 dia
+        maxAge: 60 * 60 * 24, 
       });
     }
     return response.data;
   };
 
   const getMe = async () => {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/me');
     return response.data;
   };
 

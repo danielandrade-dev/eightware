@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await fetch('http://localhost:3000/api/v1/auth/signup', {
+    const response = await fetch('http://localhost:3001/api/v1/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

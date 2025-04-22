@@ -25,7 +25,7 @@ export default function SignUpPage() {
       await signup(email, password);
       router.push('/profile');
     } catch (err) {
-      setError('Erro ao criar conta. Tente novamente.');
+      setError('Erro ao criar conta. Tente novamente. (' + err + ')');
     }
   };
 

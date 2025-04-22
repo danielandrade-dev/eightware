@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, password } = body;
 
-    const response = await fetch('http://localhost:3000/api/v1/auth/login', {
+    const response = await fetch('http://localhost:3001/api/v1/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
