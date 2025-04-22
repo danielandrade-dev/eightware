@@ -30,7 +30,10 @@ module Api
       end
 
       def me
-        render json: current_user.as_json(except: [:jti])
+        render json: {
+          user: current_user.as_json(except: [:jti]),
+          message: 'Usuário autenticado com sucesso'
+        }, status: :ok
       end
 
       private

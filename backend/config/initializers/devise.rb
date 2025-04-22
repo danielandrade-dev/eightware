@@ -14,7 +14,7 @@ Devise.setup do |config|
   # confirmation, reset password and unlock tokens in the database.
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
-  # config.secret_key = '3b8cbf85041ba3d535da617ecfadc7b96ad43f658c899d4448de767adb5ae77b9ea734ebc4c9c11667f0a8133db899e0e188b6af0eaadbe06f31dc96532301ad'
+  config.secret_key = '3b8cbf85041ba3d535da617ecfadc7b96ad43f658c899d4448de767adb5ae77b9ea734ebc4c9c11667f0a8133db899e0e188b6af0eaadbe06f31dc96532301ad'
 
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
@@ -313,12 +313,13 @@ Devise.setup do |config|
 
   # ==> JWT Configuration
   config.jwt do |jwt|
-    jwt.secret = ENV['DEVISE_JWT_SECRET_KEY'] || Rails.application.credentials.devise_jwt_secret_key
+    jwt.secret = Rails.application.secret_key_base
     jwt.dispatch_requests = [
-      ['POST', %r{^/api/v1/auth/login$}]
+      ['POST', %r{^/api/v1/login$}],
+      ['POST', %r{^/api/v1/signup$}]
     ]
     jwt.revocation_requests = [
-      ['DELETE', %r{^/api/v1/auth/logout$}]
+      ['DELETE', %r{^/api/v1/logout$}]
     ]
     jwt.expiration_time = 1.day.to_i
   end
