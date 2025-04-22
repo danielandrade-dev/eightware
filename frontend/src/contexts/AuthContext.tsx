@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { useAuth as useAuthService, User } from '../services/auth';
+import { useAuth as useAuthService, User } from '../hooks/useAuth';
 
 interface AuthContextData {
   user: User | null;

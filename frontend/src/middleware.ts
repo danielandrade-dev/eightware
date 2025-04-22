@@ -2,27 +2,24 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token');
-  const { pathname } = request.nextUrl;
+  const token = request.cookies.get('token')?.value;
+  const isAuthPage = request.nextUrl.pathname.startsWith('/login') || 
+                    request.nextUrl.pathname.startsWith('/signup');
+  const isProfilePage = request.nextUrl.pathname.startsWith('/profile');
 
-  // Rotas que requerem autenticação
-  const protectedRoutes = ['/profile'];
-
-  // Se a rota requer autenticação e não há token, redireciona para login
-  if (protectedRoutes.includes(pathname) && !token) {
-    const url = new URL('/login', request.url);
-    return NextResponse.redirect(url);
+  // Se estiver na página de autenticação e já tiver token, redireciona para o profile
+  if (isAuthPage && token) {
+    return NextResponse.redirect(new URL('/profile', request.url));
   }
 
-  // Se o usuário está autenticado e tenta acessar login/signup, redireciona para profile
-  if (token && (pathname === '/login' || pathname === '/signup')) {
-    const url = new URL('/profile', request.url);
-    return NextResponse.redirect(url);
+  // Se estiver na página de profile e não tiver token, redireciona para o login
+  if (isProfilePage && !token) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/profile', '/login', '/signup'],
+  matcher: ['/profile/:path*', '/login', '/signup'],
 }; 
