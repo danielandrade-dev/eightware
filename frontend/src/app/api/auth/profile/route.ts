@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
     const token = authHeader.split(' ')[1];
 
-    const response = await fetch('http://localhost:3001/api/v1/me', {
+    const response = await fetch('http://localhost:3001/me', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
