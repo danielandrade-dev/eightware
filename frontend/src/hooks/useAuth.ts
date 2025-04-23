@@ -3,7 +3,8 @@ import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { useEffect } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+console.log('API_URL', API_URL);
 
 export interface SignUpData {
   email: string;

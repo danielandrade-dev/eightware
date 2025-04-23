@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "3443:3443"  # Porta HTTPS
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=sqlite3:///rails/db/production.sqlite3
+      # Chave secreta para ambiente de produção
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE:-73af07e1cc2f8563fb3e0a45f54da24db2c9a218e6cec85cfa7c0e7c8deafb27892f72dab2ce6ad19f9b61ebeccc741b7c2a1d6a8b4b2c0b4fb2ae49667c29f8}
+      - RAILS_SERVE_STATIC_FILES=true
+      - RAILS_LOG_TO_STDOUT=true
+      - RAILS_FORCE_SSL=true
+    volumes:
+      - ./backend/storage:/rails/storage
+      - ./backend/db:/rails/db
+      - ./ssl:/rails/ssl:ro
+    restart: unless-stopped
+    networks:
+      - app-network
+    command: >
+      bash -c "bundle exec rails server -b 'ssl://0.0.0.0:3443?key=/rails/ssl/server.key&cert=/rails/ssl/server.crt' -b '0.0.0.0:3000'"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+      - "3444:3000"  # Porta HTTPS
+    environment:
+      - NEXT_PUBLIC_API_URL=https://backend:3443
+      - NODE_ENV=production
+      - HTTPS=true
+      - SSL_CRT_FILE=/app/ssl/server.crt
+      - SSL_KEY_FILE=/app/ssl/server.key
+    volumes:
+      - ./ssl:/app/ssl:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  storage_data: 

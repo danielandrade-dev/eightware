@@ -16,6 +16,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Definir variáveis de ambiente públicas
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3443',
+  },
+  // Configurações para HTTPS
+  serverRuntimeConfig: {
+    https: {
+      rejectUnauthorized: false, // Aceitar certificados auto-assinados
+    },
+  },
 };
 
 export default nextConfig;

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+echo "===== Iniciando aplicação com Docker ====="
+
+# Gerar uma chave secreta aleatória para o Rails
+SECRET_KEY=$(openssl rand -hex 64)
+export SECRET_KEY_BASE=$SECRET_KEY
+
+echo "Chave secreta gerada para o Rails."
+echo "Parando containers existentes..."
+docker-compose down
+
+echo "Removendo imagens antigas do backend..."
+docker rmi -f eightware_backend
+
+# Verificar e criar diretório ssl se não existir
+if [ ! -d "./ssl" ]; then
+  echo "Criando diretório para certificados SSL..."
+  mkdir -p ./ssl
+fi
+
+# Gerar certificados SSL auto-assinados se não existirem
+if [ ! -f "./ssl/server.key" ] || [ ! -f "./ssl/server.crt" ]; then
+  echo "Gerando certificados SSL auto-assinados..."
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout ./ssl/server.key -out ./ssl/server.crt \
+    -subj "/C=BR/ST=Estado/L=Cidade/O=Eightware/OU=TI/CN=localhost"
+  
+  # Ajustar permissões
+  chmod 644 ./ssl/server.crt
+  chmod 600 ./ssl/server.key
+fi
+
+echo "Builiding containers..."
+docker-compose build --no-cache backend
+
+echo "Starting containers..."
+docker-compose up -d
+
+echo "===== Containers iniciados com sucesso ====="
+echo "Frontend HTTP: http://localhost:3001"
+echo "Frontend HTTPS: https://localhost:3444"
+echo "Backend HTTP: http://localhost:3000"
+echo "Backend HTTPS: https://localhost:3443"
+echo ""
+echo "IMPORTANTE: Como estamos usando certificados auto-assinados, seu navegador"
+echo "mostrará um aviso de segurança. Você pode prosseguir de forma segura."
+echo ""
+echo "Para ver os logs, execute: docker-compose logs -f"
+echo "Para parar os containers, execute: docker-compose down" 

@@ -1,0 +1,40 @@
+# Controle de versão
+.git
+.github
+.gitignore
+
+# Dependências
+node_modules
+.pnpm-store
+
+# Arquivos de build
+.next
+out
+
+# Arquivos de ambiente local
+.env*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cobertura de testes
+coverage
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos do Docker
+Dockerfile*
+.dockerignore
+
+# SWC
+.swc 
