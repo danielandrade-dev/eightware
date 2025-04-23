@@ -3,24 +3,21 @@ require 'rails_helper'
 RSpec.describe 'Authentication', type: :request do
   let(:user) { create(:user) }
   let(:valid_attributes) { 
-    { 
+    {
+      name: 'Test User',
       email: 'test@example.com',
-      password: 'password123',
-      password_confirmation: 'password123'
+      password: 'Password123',
+      password_confirmation: 'Password123'
     } 
   }
   let(:invalid_attributes) { 
     { 
+      name: 'Test User',
       email: '',
       password: 'password123',
       password_confirmation: 'password123'
     } 
   }
-
-  before do
-    # Configuração da sessão para os testes
-    allow_any_instance_of(ActionDispatch::Request).to receive(:session).and_return({})
-  end
 
   describe 'POST /signup' do
     context 'com parâmetros válidos' do
@@ -61,12 +58,12 @@ RSpec.describe 'Authentication', type: :request do
 
     context 'com credenciais válidas' do
       it 'retorna status 200' do
-        post '/login', params: { email: existing_user.email, password: 'password123' }
+        post '/login', params: { email: existing_user.email, password: 'Password123' }
         expect(response).to have_http_status(:ok)
       end
 
       it 'retorna o token JWT e dados do usuário' do
-        post '/login', params: { email: existing_user.email, password: 'password123' }
+        post '/login', params: { email: existing_user.email, password: 'Password123' }
         expect(JSON.parse(response.body)).to include('user', 'token')
       end
     end
@@ -88,61 +85,17 @@ RSpec.describe 'Authentication', type: :request do
     end
   end
 
-  describe 'DELETE /logout' do
-    let!(:existing_user) { create(:user) }
-    let(:auth_token) do
-      post '/login', params: { email: existing_user.email, password: 'password123' }
-      JSON.parse(response.body)['token']
-    end
-
-    context 'com token válido' do
-      it 'retorna status 200' do
-        delete '/logout', headers: { 'Authorization' => "Bearer #{auth_token}" }
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'retorna mensagem de sucesso' do
-        delete '/logout', headers: { 'Authorization' => "Bearer #{auth_token}" }
-        expect(JSON.parse(response.body)).to include('message' => 'Sessão encerrada com sucesso')
-      end
-
-      it 'invalida o token JWT' do
-        delete '/logout', headers: { 'Authorization' => "Bearer #{auth_token}" }
-        get '/me', headers: { 'Authorization' => "Bearer #{auth_token}" }
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
-
-    context 'sem token' do
-      it 'retorna status 401' do
-        delete '/logout'
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
-
-    context 'com token inválido' do
-      it 'retorna status 401' do
-        delete '/logout', headers: { 'Authorization' => 'Bearer invalid_token' }
-        expect(response).to have_http_status(:unauthorized)
-      end
-    end
-  end
-
   describe 'GET /me' do
     let!(:existing_user) { create(:user) }
-    let(:auth_token) do
-      post '/login', params: { email: existing_user.email, password: 'password123' }
-      JSON.parse(response.body)['token']
-    end
 
     context 'com token válido' do
       it 'retorna status 200' do
-        get '/me', headers: { 'Authorization' => "Bearer #{auth_token}" }
+        get '/me', headers: auth_headers(existing_user)
         expect(response).to have_http_status(:ok)
       end
 
       it 'retorna os dados do usuário' do
-        get '/me', headers: { 'Authorization' => "Bearer #{auth_token}" }
+        get '/me', headers: auth_headers(existing_user)
         expect(JSON.parse(response.body)['user']['email']).to eq(existing_user.email)
       end
     end
@@ -157,6 +110,43 @@ RSpec.describe 'Authentication', type: :request do
     context 'com token inválido' do
       it 'retorna status 401' do
         get '/me', headers: { 'Authorization' => 'Bearer invalid_token' }
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe 'DELETE /logout' do
+    let!(:existing_user) { create(:user) }
+
+    context 'com token válido' do
+      it 'retorna status 200' do
+        delete '/logout', headers: auth_headers(existing_user)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'retorna mensagem de sucesso' do
+        delete '/logout', headers: auth_headers(existing_user)
+        expect(JSON.parse(response.body)).to include('message' => 'Sessão encerrada com sucesso')
+      end
+
+      it 'invalida o token JWT' do
+        headers = auth_headers(existing_user)
+        delete '/logout', headers: headers
+        get '/me', headers: headers
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'sem token' do
+      it 'retorna status 401' do
+        delete '/logout'
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'com token inválido' do
+      it 'retorna status 401' do
+        delete '/logout', headers: { 'Authorization' => 'Bearer invalid_token' }
         expect(response).to have_http_status(:unauthorized)
       end
     end
