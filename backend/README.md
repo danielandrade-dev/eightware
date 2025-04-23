@@ -44,7 +44,7 @@ Cria uma nova conta de usuário.
 {
   "email": "usuario@exemplo.com",
   "password": "Senha123",
-  "name": "Nome do Usuário" // opcional
+  "name": "Nome do Usuário"
 }
 ```
 
